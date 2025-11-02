@@ -1,0 +1,129 @@
+name: Deploy Backend Only
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '*_handler.py'
+      - 'sst.config.ts'
+      - 'pyproject.toml'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  deploy:
+    name: Deploy Backend Infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3
+
+      - name: Validate Python handlers
+        run: |
+          echo "Validating Python Lambda handlers..."
+          python -m py_compile counter_handler.py
+          python -m py_compile chatbot_handler.py
+          echo "✅ Python handlers validated"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy with SST
+        run: |
+          echo "🚀 Deploying backend infrastructure..."
+          npx sst deploy --stage production
+
+      - name: Get deployment outputs
+        id: outputs
+        run: |
+          echo "📊 Getting deployment outputs..."
+          OUTPUTS=$(npx sst outputs --stage production --format json)
+          echo "$OUTPUTS" | jq .
+
+          COUNTER_URL=$(echo $OUTPUTS | jq -r '.counterUrl')
+          CHATBOT_URL=$(echo $OUTPUTS | jq -r '.chatbotUrl')
+          TABLE_NAME=$(echo $OUTPUTS | jq -r '.tableName')
+
+          echo "counter-url=$COUNTER_URL" >> $GITHUB_OUTPUT
+          echo "chatbot-url=$CHATBOT_URL" >> $GITHUB_OUTPUT
+          echo "table-name=$TABLE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Test Lambda endpoints
+        run: |
+          echo "🧪 Testing Lambda endpoints..."
+
+          COUNTER_URL="${{ steps.outputs.outputs.counter-url }}"
+          CHATBOT_URL="${{ steps.outputs.outputs.chatbot-url }}"
+
+          echo "Testing Counter API..."
+          COUNTER_RESPONSE=$(curl -s "$COUNTER_URL")
+          echo "Counter Response: $COUNTER_RESPONSE"
+
+          if echo "$COUNTER_RESPONSE" | jq -e '.count' > /dev/null; then
+            echo "✅ Counter API working"
+          else
+            echo "❌ Counter API failed"
+            exit 1
+          fi
+
+          echo "Testing Chatbot API..."
+          CHATBOT_RESPONSE=$(curl -s -X POST "$CHATBOT_URL" \
+            -H "Content-Type: application/json" \
+            -d '{"question": "Test"}')
+          echo "Chatbot Response: $CHATBOT_RESPONSE"
+
+          if echo "$CHATBOT_RESPONSE" | jq -e '.answer' > /dev/null || echo "$CHATBOT_RESPONSE" | jq -e '.error' > /dev/null; then
+            echo "✅ Chatbot API working"
+          else
+            echo "❌ Chatbot API failed"
+            exit 1
+          fi
+
+      - name: Create deployment summary
+        if: always()
+        run: |
+          echo "# 🚀 Backend Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## API Endpoints" >> $GITHUB_STEP_SUMMARY
+          echo "- **Counter API**: ${{ steps.outputs.outputs.counter-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Chatbot API**: ${{ steps.outputs.outputs.chatbot-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Infrastructure" >> $GITHUB_STEP_SUMMARY
+          echo "- **DynamoDB Table**: ${{ steps.outputs.outputs.table-name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **AWS Region**: ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Stage**: production" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Backend deployment completed successfully!" >> $GITHUB_STEP_SUMMARY

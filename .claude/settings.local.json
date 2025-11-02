@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m pip:*)",
+      "Bash(curl:*)",
+      "Bash(sh:*)",
+      "Bash(aws logs tail:*)",
+      "Bash(npx sst deploy:*)",
+      "Bash(npm run deploy:*)",
+      "Bash(echo:*)",
+      "Bash(/opt/homebrew/bin/npx sst deploy --stage dev)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(/opt/homebrew/bin/node:*)",
+      "Bash(./node_modules/.bin/sst deploy:*)",
+      "Bash(python3:*)",
+      "Bash(cat:*)",
+      "Bash(./node_modules/.bin/sst unlock:*)",
+      "Read(//usr/local/bin/**)",
+      "Bash(PATH=\"/usr/local/bin:$PATH\" npm run deploy:*)",
+      "Bash(/usr/local/bin/node:*)",
+      "Bash(chmod:*)",
+      "Bash(./deploy.sh:*)",
+      "Bash(/Users/amanuelzegeye/.local/bin/uv pip list:*)",
+      "Bash(PATH=\"/Users/amanuelzegeye/.local/bin:/usr/local/bin:$PATH\" /usr/local/bin/node:*)",
+      "Bash(export PATH=\"/usr/bin:/bin:/Users/amanuelzegeye/.local/bin:/usr/local/bin:$PATH\")",
+      "Bash(/usr/local/aws-cli/aws iam list-open-id-connect-providers:*)",
+      "Bash(/usr/local/aws-cli/aws iam create-role:*)",
+      "Bash(/usr/local/aws-cli/aws iam create-policy:*)",
+      "Bash(/usr/local/aws-cli/aws iam attach-role-policy:*)",
+      "Bash(/usr/local/aws-cli/aws iam get-role:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
