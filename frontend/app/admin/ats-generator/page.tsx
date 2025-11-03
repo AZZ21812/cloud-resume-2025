@@ -98,7 +98,8 @@ Generate the complete resume now:`
       }
 
       const data = await response.json()
-      setTailoredResume(data.response || data.message || 'Resume generated successfully')
+      // Chatbot API returns "answer" field
+      setTailoredResume(data.answer || data.response || data.message || 'Resume generated successfully')
       setGenerated(true)
     } catch (err) {
       setError('Failed to generate resume. Please try again.')
