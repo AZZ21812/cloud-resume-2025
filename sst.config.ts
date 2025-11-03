@@ -62,7 +62,7 @@ export default $config({
     // Lambda function: ATS Resume Generator (Amazon Bedrock)
     // -----------------------------
     const atsGeneratorApi = new sst.aws.Function("ATSGeneratorFunction", {
-        handler: "cloud_resume_2025/ats_generator_handler.handler",
+        handler: "cloud_resume_2025/ats_handler.handler",
         runtime: "python3.12",
         url: {
           cors: true,

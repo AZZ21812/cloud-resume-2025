@@ -27,7 +27,11 @@
       "Bash(/usr/local/aws-cli/aws iam create-role:*)",
       "Bash(/usr/local/aws-cli/aws iam create-policy:*)",
       "Bash(/usr/local/aws-cli/aws iam attach-role-policy:*)",
-      "Bash(/usr/local/aws-cli/aws iam get-role:*)"
+      "Bash(/usr/local/aws-cli/aws iam get-role:*)",
+      "Bash(/usr/local/aws-cli/aws logs tail:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
