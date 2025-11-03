@@ -229,95 +229,120 @@ START RESUME NOW:`
 
   const handleDownloadPDF = async () => {
     try {
-      // Create new PDF document
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       })
 
-      // Set professional styling
       const pageWidth = doc.internal.pageSize.getWidth()
       const pageHeight = doc.internal.pageSize.getHeight()
-      const margin = 15
-      const maxWidth = pageWidth - (margin * 2)
+      const leftMargin = 20
+      const rightMargin = 20
+      const maxWidth = pageWidth - leftMargin - rightMargin
+      let y = 20
 
-      let yPosition = margin
+      // Helper function to check if we need a new page
+      const checkPageBreak = (heightNeeded: number) => {
+        if (y + heightNeeded > pageHeight - 20) {
+          doc.addPage()
+          y = 20
+          return true
+        }
+        return false
+      }
 
-      // Parse resume text and add to PDF with proper formatting
-      const lines = tailoredResume.split('\n')
+      // Parse the resume text
+      const resumeLines = tailoredResume.split('\n')
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim()
+      // Process each line
+      for (let i = 0; i < resumeLines.length; i++) {
+        const line = resumeLines[i].trim()
 
         // Skip empty lines but add spacing
         if (!line) {
-          yPosition += 3
+          y += 2
           continue
         }
 
-        // Detect headers (all caps or specific sections)
-        const isHeader = /^[A-Z\s&]+$/.test(line) && line.length < 50
-        const isSectionHeader = /^(PROFESSIONAL SUMMARY|TECHNICAL SKILLS|PROFESSIONAL EXPERIENCE|PROJECTS|EDUCATION|CERTIFICATIONS)/.test(line)
+        // Detect different types of content
+        const isSectionHeader = /^(PROFESSIONAL SUMMARY|TECHNICAL SKILLS|PROFESSIONAL EXPERIENCE|EXPERIENCE|PROJECTS|EDUCATION|CERTIFICATIONS)$/i.test(line)
+        const isContactInfo = line.includes('@') || line.includes('linkedin.com') || line.includes('github.com') || /^\+?\d/.test(line)
+        const isBullet = line.startsWith('•') || line.startsWith('-')
+        const isJobTitle = line.includes('|') && (line.includes('20') || line.includes('19'))
+        const isName = i === 0 || (i < 5 && /^[A-Z][a-z]+\s+[A-Z]\.?\s+[A-Z][a-z]+/.test(line))
 
-        // Check if we need a new page
-        if (yPosition > pageHeight - margin - 10) {
-          doc.addPage()
-          yPosition = margin
-        }
-
-        if (isSectionHeader) {
-          // Section headers: bold, larger, with spacing
+        // Render based on content type
+        if (isName) {
+          // Name - large, bold, centered
+          checkPageBreak(10)
+          doc.setFontSize(18)
+          doc.setFont('helvetica', 'bold')
+          doc.setTextColor(0, 0, 0)
+          doc.text(line, pageWidth / 2, y, { align: 'center' })
+          y += 8
+        } else if (isContactInfo && i < 10) {
+          // Contact info - smaller, centered
+          checkPageBreak(5)
+          doc.setFontSize(9)
+          doc.setFont('helvetica', 'normal')
+          doc.setTextColor(60, 60, 60)
+          doc.text(line, pageWidth / 2, y, { align: 'center' })
+          y += 4
+        } else if (isSectionHeader) {
+          // Section headers - bold, with line underneath
+          checkPageBreak(10)
+          y += 4
           doc.setFontSize(12)
           doc.setFont('helvetica', 'bold')
-          yPosition += 3
-          doc.text(line, margin, yPosition)
-          yPosition += 6
-          // Add underline
+          doc.setTextColor(0, 0, 0)
+          doc.text(line.toUpperCase(), leftMargin, y)
+          y += 2
           doc.setLineWidth(0.5)
-          doc.line(margin, yPosition, margin + 60, yPosition)
-          yPosition += 2
-        } else if (isHeader && i === 0) {
-          // Name header (first line)
-          doc.setFontSize(16)
-          doc.setFont('helvetica', 'bold')
-          doc.text(line, margin, yPosition)
-          yPosition += 7
-        } else if (line.startsWith('•') || line.startsWith('-')) {
-          // Bullet points
-          doc.setFontSize(10)
-          doc.setFont('helvetica', 'normal')
-          const bulletText = line.substring(1).trim()
-          const splitText = doc.splitTextToSize(bulletText, maxWidth - 5)
-          doc.text('•', margin, yPosition)
-          doc.text(splitText, margin + 5, yPosition)
-          yPosition += splitText.length * 4.5
-        } else if (line.includes('|')) {
-          // Job title lines with dates
+          doc.setDrawColor(0, 0, 0)
+          doc.line(leftMargin, y, pageWidth - rightMargin, y)
+          y += 5
+        } else if (isJobTitle) {
+          // Job titles with dates - bold
+          checkPageBreak(6)
           doc.setFontSize(11)
           doc.setFont('helvetica', 'bold')
-          const splitText = doc.splitTextToSize(line, maxWidth)
-          doc.text(splitText, margin, yPosition)
-          yPosition += splitText.length * 5
-        } else {
-          // Regular text
+          doc.setTextColor(0, 0, 0)
+          const lines = doc.splitTextToSize(line, maxWidth)
+          doc.text(lines, leftMargin, y)
+          y += lines.length * 5
+        } else if (isBullet) {
+          // Bullet points - indented
+          checkPageBreak(6)
           doc.setFontSize(10)
           doc.setFont('helvetica', 'normal')
-          const splitText = doc.splitTextToSize(line, maxWidth)
-          doc.text(splitText, margin, yPosition)
-          yPosition += splitText.length * 4.5
+          doc.setTextColor(40, 40, 40)
+          const bulletText = line.substring(line.indexOf('•') + 1 || line.indexOf('-') + 1).trim()
+          const lines = doc.splitTextToSize(bulletText, maxWidth - 8)
+          doc.text('•', leftMargin + 2, y)
+          doc.text(lines, leftMargin + 7, y)
+          y += lines.length * 4 + 1
+        } else {
+          // Regular paragraph text
+          checkPageBreak(6)
+          doc.setFontSize(10)
+          doc.setFont('helvetica', 'normal')
+          doc.setTextColor(40, 40, 40)
+          const lines = doc.splitTextToSize(line, maxWidth)
+          doc.text(lines, leftMargin, y)
+          y += lines.length * 4.5 + 1
         }
       }
 
       // Add footer with page numbers
-      const pageCount = doc.internal.pages.length - 1
-      for (let i = 1; i <= pageCount; i++) {
+      const totalPages = doc.internal.pages.length - 1
+      doc.setTextColor(128, 128, 128)
+      for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i)
         doc.setFontSize(8)
         doc.setFont('helvetica', 'normal')
-        doc.setTextColor(128, 128, 128)
         doc.text(
-          `Amanuel Z. Alemu - Page ${i} of ${pageCount}`,
+          `Amanuel Z. Alemu - Resume - Page ${i} of ${totalPages}`,
           pageWidth / 2,
           pageHeight - 10,
           { align: 'center' }
