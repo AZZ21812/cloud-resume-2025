@@ -5,11 +5,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "ATSGeneratorFunction": {
-      "name": string
-      "type": "sst.aws.Function"
-      "url": string
-    }
     "ChatbotFunction": {
       "name": string
       "type": "sst.aws.Function"
