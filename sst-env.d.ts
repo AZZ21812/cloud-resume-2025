@@ -15,6 +15,10 @@ declare module "sst" {
       "type": "sst.aws.Function"
       "url": string
     }
+    "Frontend": {
+      "type": "sst.aws.Nextjs"
+      "url": string
+    }
     "VisitorCounter": {
       "name": string
       "type": "sst.aws.Dynamo"

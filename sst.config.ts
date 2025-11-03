@@ -59,12 +59,24 @@ export default $config({
     });
 
     // -----------------------------
+    // Frontend: S3 + CloudFront Static Site
+    // -----------------------------
+    const frontend = new sst.aws.Nextjs("Frontend", {
+      path: "./frontend",
+      environment: {
+        NEXT_PUBLIC_COUNTER_API: counterApi.url,
+        NEXT_PUBLIC_CHATBOT_API: chatbotApi.url,
+      },
+    });
+
+    // -----------------------------
     // Return outputs for frontend / other usage
     // -----------------------------
     return {
       tableName: table.name,
       counterUrl: counterApi.url,
       chatbotUrl: chatbotApi.url,
+      frontendUrl: frontend.url,
     };
   },
 });

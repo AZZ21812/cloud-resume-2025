@@ -14,6 +14,9 @@ class Resource:
         name: str
         type: str
         url: str
+    class Frontend:
+        type: str
+        url: str
     class VisitorCounter:
         name: str
         type: str

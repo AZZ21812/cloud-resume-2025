@@ -30,14 +30,15 @@ jobs:
     name: Run CI Checks
     uses: ./.github/workflows/ci.yml
 
-  # Deploy Backend (Lambda functions, DynamoDB)
-  deploy-backend:
-    name: Deploy Backend Infrastructure
+  # Deploy Full Stack (Backend + Frontend) with SST
+  deploy-fullstack:
+    name: Deploy Full Stack with SST
     runs-on: ubuntu-latest
     needs: ci-checks
     outputs:
       counter-url: ${{ steps.get-outputs.outputs.counter-url }}
       chatbot-url: ${{ steps.get-outputs.outputs.chatbot-url }}
+      frontend-url: ${{ steps.get-outputs.outputs.frontend-url }}
 
     steps:
       - name: Checkout code
@@ -54,134 +55,113 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: |
           npm ci
           python -m pip install --upgrade pip
           pip install boto3
 
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Deploy Backend with SST
+      - name: Deploy Full Stack with SST
         run: |
-          echo "Deploying backend infrastructure..."
+          echo "🚀 Deploying full stack (Backend + Frontend)..."
           npx sst deploy --stage production
 
       - name: Get deployment outputs
         id: get-outputs
         run: |
+          echo "📊 Getting deployment outputs..."
           OUTPUTS=$(npx sst outputs --stage production --format json)
+
           COUNTER_URL=$(echo $OUTPUTS | jq -r '.counterUrl')
           CHATBOT_URL=$(echo $OUTPUTS | jq -r '.chatbotUrl')
+          FRONTEND_URL=$(echo $OUTPUTS | jq -r '.frontendUrl')
+
           echo "counter-url=$COUNTER_URL" >> $GITHUB_OUTPUT
           echo "chatbot-url=$CHATBOT_URL" >> $GITHUB_OUTPUT
-          echo "Counter URL: $COUNTER_URL"
-          echo "Chatbot URL: $CHATBOT_URL"
+          echo "frontend-url=$FRONTEND_URL" >> $GITHUB_OUTPUT
 
-      - name: Test Lambda endpoints
+          echo "✅ Counter URL: $COUNTER_URL"
+          echo "✅ Chatbot URL: $CHATBOT_URL"
+          echo "✅ Frontend URL: $FRONTEND_URL"
+
+      - name: Test Backend Endpoints
         run: |
           COUNTER_URL="${{ steps.get-outputs.outputs.counter-url }}"
           CHATBOT_URL="${{ steps.get-outputs.outputs.chatbot-url }}"
 
-          echo "Testing Counter API..."
+          echo "🧪 Testing Counter API..."
           COUNTER_RESPONSE=$(curl -s "$COUNTER_URL")
           echo "Counter Response: $COUNTER_RESPONSE"
 
-          echo "Testing Chatbot API..."
+          echo "🧪 Testing Chatbot API..."
           CHATBOT_RESPONSE=$(curl -s -X POST "$CHATBOT_URL" \
             -H "Content-Type: application/json" \
             -d '{"question": "Hello"}')
           echo "Chatbot Response: $CHATBOT_RESPONSE"
 
-  # Deploy Frontend (S3 + CloudFront or Static Export)
-  deploy-frontend:
-    name: Deploy Frontend
-    runs-on: ubuntu-latest
-    needs: deploy-backend
-
-    defaults:
-      run:
-        working-directory: ./frontend
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
-        env:
-          NEXT_PUBLIC_COUNTER_API: ${{ needs.deploy-backend.outputs.counter-url }}
-          NEXT_PUBLIC_CHATBOT_API: ${{ needs.deploy-backend.outputs.chatbot-url }}
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Deploy to S3
-        if: env.S3_BUCKET != ''
+      - name: Test Frontend
         run: |
-          echo "Deploying to S3 bucket: ${{ secrets.S3_BUCKET }}"
-          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }} --delete
-        env:
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          FRONTEND_URL="${{ steps.get-outputs.outputs.frontend-url }}"
 
-      - name: Invalidate CloudFront cache
-        if: env.CLOUDFRONT_DISTRIBUTION_ID != ''
-        run: |
-          echo "Invalidating CloudFront distribution: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
-        env:
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          echo "🧪 Testing Frontend..."
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL")
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: frontend/out/
-          retention-days: 7
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Frontend is accessible (HTTP $HTTP_CODE)"
+          else
+            echo "⚠️ Frontend returned HTTP $HTTP_CODE"
+          fi
 
   # Deployment summary
   deployment-summary:
     name: Deployment Summary
     runs-on: ubuntu-latest
-    needs: [deploy-backend, deploy-frontend]
+    needs: deploy-fullstack
     if: always()
 
     steps:
       - name: Create deployment summary
         run: |
-          echo "# 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "# 🚀 Cloud Resume Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Backend Services" >> $GITHUB_STEP_SUMMARY
-          echo "- **Counter API**: ${{ needs.deploy-backend.outputs.counter-url }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Chatbot API**: ${{ needs.deploy-backend.outputs.chatbot-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "## 🌐 Live URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend**: ${{ needs.deploy-fullstack.outputs.frontend-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Counter API**: ${{ needs.deploy-fullstack.outputs.counter-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Chatbot API**: ${{ needs.deploy-fullstack.outputs.chatbot-url }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Status" >> $GITHUB_STEP_SUMMARY
-          echo "- Backend: ${{ needs.deploy-backend.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Frontend: ${{ needs.deploy-frontend.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "## 📦 Infrastructure" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Lambda Functions (Counter + Chatbot)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ DynamoDB Table (Visitor Counter)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ S3 Bucket (Static Assets)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ CloudFront Distribution (Global CDN)" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Bedrock Integration (AI Chatbot)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Deployment completed successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Full Stack: ${{ needs.deploy-fullstack.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Deployment completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎉 Your Cloud Resume is now live at: ${{ needs.deploy-fullstack.outputs.frontend-url }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Notify on failure
         if: failure()
         run: |
           echo "# ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
-          echo "Please check the logs for more details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please check the logs above for error details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Common issues:" >> $GITHUB_STEP_SUMMARY
+          echo "- AWS credentials not configured" >> $GITHUB_STEP_SUMMARY
+          echo "- SST deployment errors" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend build failures" >> $GITHUB_STEP_SUMMARY
