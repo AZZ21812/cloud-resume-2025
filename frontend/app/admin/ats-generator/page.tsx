@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, FileDown, Sparkles, Upload, AlertCircle, CheckCircle, Loader } from 'lucide-react'
+import jsPDF from 'jspdf'
 
 export default function ATSGenerator() {
   const router = useRouter()
@@ -227,10 +228,109 @@ START RESUME NOW:`
   }
 
   const handleDownloadPDF = async () => {
-    // TODO: Implement PDF generation using a library like jsPDF or react-pdf
-    // For now, download as text file
-    alert('PDF generation coming soon! Downloading as text file for now.')
-    handleDownload()
+    try {
+      // Create new PDF document
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      })
+
+      // Set professional styling
+      const pageWidth = doc.internal.pageSize.getWidth()
+      const pageHeight = doc.internal.pageSize.getHeight()
+      const margin = 15
+      const maxWidth = pageWidth - (margin * 2)
+
+      let yPosition = margin
+
+      // Parse resume text and add to PDF with proper formatting
+      const lines = tailoredResume.split('\n')
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim()
+
+        // Skip empty lines but add spacing
+        if (!line) {
+          yPosition += 3
+          continue
+        }
+
+        // Detect headers (all caps or specific sections)
+        const isHeader = /^[A-Z\s&]+$/.test(line) && line.length < 50
+        const isSectionHeader = /^(PROFESSIONAL SUMMARY|TECHNICAL SKILLS|PROFESSIONAL EXPERIENCE|PROJECTS|EDUCATION|CERTIFICATIONS)/.test(line)
+
+        // Check if we need a new page
+        if (yPosition > pageHeight - margin - 10) {
+          doc.addPage()
+          yPosition = margin
+        }
+
+        if (isSectionHeader) {
+          // Section headers: bold, larger, with spacing
+          doc.setFontSize(12)
+          doc.setFont('helvetica', 'bold')
+          yPosition += 3
+          doc.text(line, margin, yPosition)
+          yPosition += 6
+          // Add underline
+          doc.setLineWidth(0.5)
+          doc.line(margin, yPosition, margin + 60, yPosition)
+          yPosition += 2
+        } else if (isHeader && i === 0) {
+          // Name header (first line)
+          doc.setFontSize(16)
+          doc.setFont('helvetica', 'bold')
+          doc.text(line, margin, yPosition)
+          yPosition += 7
+        } else if (line.startsWith('•') || line.startsWith('-')) {
+          // Bullet points
+          doc.setFontSize(10)
+          doc.setFont('helvetica', 'normal')
+          const bulletText = line.substring(1).trim()
+          const splitText = doc.splitTextToSize(bulletText, maxWidth - 5)
+          doc.text('•', margin, yPosition)
+          doc.text(splitText, margin + 5, yPosition)
+          yPosition += splitText.length * 4.5
+        } else if (line.includes('|')) {
+          // Job title lines with dates
+          doc.setFontSize(11)
+          doc.setFont('helvetica', 'bold')
+          const splitText = doc.splitTextToSize(line, maxWidth)
+          doc.text(splitText, margin, yPosition)
+          yPosition += splitText.length * 5
+        } else {
+          // Regular text
+          doc.setFontSize(10)
+          doc.setFont('helvetica', 'normal')
+          const splitText = doc.splitTextToSize(line, maxWidth)
+          doc.text(splitText, margin, yPosition)
+          yPosition += splitText.length * 4.5
+        }
+      }
+
+      // Add footer with page numbers
+      const pageCount = doc.internal.pages.length - 1
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+        doc.setFontSize(8)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(128, 128, 128)
+        doc.text(
+          `Amanuel Z. Alemu - Page ${i} of ${pageCount}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: 'center' }
+        )
+      }
+
+      // Save the PDF
+      const fileName = `Amanuel_Alemu_Resume_${new Date().toISOString().split('T')[0]}.pdf`
+      doc.save(fileName)
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('Error generating PDF. Please try downloading as TXT instead.')
+    }
   }
 
   if (!isAuthenticated) {
