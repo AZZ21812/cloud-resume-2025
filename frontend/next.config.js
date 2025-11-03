@@ -12,8 +12,8 @@ const nextConfig = {
 
   // Environment variables
   env: {
-    NEXT_PUBLIC_COUNTER_API: process.env.NEXT_PUBLIC_COUNTER_API || 'https://2ms252nedqgbwiys42j2xczxpu0ctegn.lambda-url.us-east-1.on.aws/',
-    NEXT_PUBLIC_CHATBOT_API: process.env.NEXT_PUBLIC_CHATBOT_API || 'https://44vnpqjbuljusdcyw32mh3jheq0uzsoz.lambda-url.us-east-1.on.aws/',
+    NEXT_PUBLIC_COUNTER_API: process.env.NEXT_PUBLIC_COUNTER_API || 'https://3fednny2psoslmrcesjkexjtsy0yauae.lambda-url.us-east-1.on.aws/',
+    NEXT_PUBLIC_CHATBOT_API: process.env.NEXT_PUBLIC_CHATBOT_API || 'https://hefzysfj6mkfl5jl4zmueoesa40gwtfc.lambda-url.us-east-1.on.aws/',
   },
 
   // Trailing slash for S3 compatibility

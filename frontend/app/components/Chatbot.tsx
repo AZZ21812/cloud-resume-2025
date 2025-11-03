@@ -19,7 +19,7 @@ export default function Chatbot() {
 
     if (!input.trim() || loading) return
 
-    const apiUrl = process.env.NEXT_PUBLIC_CHATBOT_API || 'https://44vnpqjbuljusdcyw32mh3jheq0uzsoz.lambda-url.us-east-1.on.aws/'
+    const apiUrl = process.env.NEXT_PUBLIC_CHATBOT_API || 'https://hefzysfj6mkfl5jl4zmueoesa40gwtfc.lambda-url.us-east-1.on.aws/'
 
     if (!apiUrl) {
       alert('Chatbot API URL not configured. Please set NEXT_PUBLIC_CHATBOT_API in your .env.local file.')

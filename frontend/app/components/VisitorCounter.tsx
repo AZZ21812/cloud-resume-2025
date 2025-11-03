@@ -10,7 +10,7 @@ export default function VisitorCounter() {
 
   useEffect(() => {
     const fetchCount = async () => {
-      const apiUrl = process.env.NEXT_PUBLIC_COUNTER_API || 'https://2ms252nedqgbwiys42j2xczxpu0ctegn.lambda-url.us-east-1.on.aws/'
+      const apiUrl = process.env.NEXT_PUBLIC_COUNTER_API || 'https://3fednny2psoslmrcesjkexjtsy0yauae.lambda-url.us-east-1.on.aws/'
 
       if (!apiUrl) {
         setError('Counter API URL not configured')
