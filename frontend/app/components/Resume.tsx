@@ -10,7 +10,7 @@ export default function Resume() {
         {/* Call to Action - Schedule a Call */}
         <div className="mb-6 text-center">
           <a
-            href="https://calendar.google.com/calendar/appointments/schedules/YOUR_CALENDAR_ID"
+            href="https://calendar.app.google/bpXYCGcCCt99YQ8X8"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-full hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
