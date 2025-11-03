@@ -33,8 +33,8 @@ export default function ATSGenerator() {
     setGenerated(false)
 
     try {
-      // Call Lambda function to generate tailored resume using Bedrock AI
-      const apiUrl = 'https://hefzysfj6mkfl5jl4zmueoesa40gwtfc.lambda-url.us-east-1.on.aws/' // Your chatbot API
+      // Call dedicated ATS Generator Lambda function
+      const apiUrl = 'https://w5o6xg3bhocxumuokwh7chzb3e0ghfam.lambda-url.us-east-1.on.aws/'
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -42,53 +42,7 @@ export default function ATSGenerator() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: `Based on this job description, create an ATS-optimized resume tailored to this role. Use the following candidate information:
-
-Name: Amanuel Z. Alemu
-Title: AWS Solutions Architect, Full-Stack Developer, Fintech Specialist
-Email: Amanuelzegeye63@gmail.com
-Phone: +1 (240) 927-7827
-Location: Hyattsville, MD
-LinkedIn: https://www.linkedin.com/in/amanuel-alemu-50b014255
-GitHub: https://github.com/AZZ2181
-
-EXPERIENCE:
-- Strategy & Product Design Lead at IE Networks Solution (Sep 2024 - Apr 2025)
-  * Led launch of BPO-ITO and Tech Talent Academy initiatives, projected to contribute 20%+ of annual revenue
-  * Managed cross-functional team of 10+ engineers, analysts, and project managers delivering digital solutions
-  * Spearheaded Selamnew Workspace platform, cutting internal coordination time by 30% through cloud workflows
-
-- Senior Mobile Developer at Lersha, Green Agro Solution (Sep 2021 - May 2024)
-  * Led development of native Android applications using Java/Kotlin, serving 1,300+ agents and 100,000+ farmers
-  * Built Node.js backend systems and REST APIs for reliable data synchronization
-  * Integrated offline-first functionality for low-connectivity rural areas
-
-SKILLS:
-Cloud & DevOps: AWS (EC2, S3, Lambda, RDS, CloudFormation, Cognito), Kubernetes, CI/CD, Linux, CloudWatch
-Software Development: Java/Kotlin, Spring Boot, Node.js, React, TypeScript, REST APIs, Microservices, MySQL, PostgreSQL
-Fintech: Digital wallets, Remittance systems, Payment APIs, KYC/AML compliance, PCI DSS compliance
-Data & Analytics: ETL pipelines, QlikSense dashboards, SQL, Python
-
-EDUCATION:
-Bachelor of Science in Software Engineering, Staffordshire University (2018-2021)
-
-CERTIFICATIONS:
-- AWS Certified Solutions Architect - Associate
-- Certified Scrum Master (CSM)
-- HashiCorp Certified: Terraform Associate
-
-JOB DESCRIPTION:
-${jobDescription}
-
-Please generate an ATS-optimized resume in plain text format that:
-1. Matches keywords from the job description
-2. Highlights relevant experience and skills
-3. Uses action verbs and quantifiable achievements
-4. Follows ATS-friendly formatting (no tables, columns, or graphics)
-5. Includes a tailored professional summary
-6. Prioritizes the most relevant experience for this role
-
-Format the resume with clear sections and bullet points.`,
+          jobDescription: jobDescription,
         }),
       })
 
@@ -97,7 +51,7 @@ Format the resume with clear sections and bullet points.`,
       }
 
       const data = await response.json()
-      setTailoredResume(data.response || data.message || 'Resume generated successfully')
+      setTailoredResume(data.resume || 'Resume generated successfully')
       setGenerated(true)
     } catch (err) {
       setError('Failed to generate resume. Please try again.')

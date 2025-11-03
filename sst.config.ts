@@ -59,12 +59,35 @@ export default $config({
     });
 
     // -----------------------------
+    // Lambda function: ATS Resume Generator (Amazon Bedrock)
+    // -----------------------------
+    const atsGeneratorApi = new sst.aws.Function("ATSGeneratorFunction", {
+        handler: "cloud_resume_2025/ats_generator_handler.handler",
+        runtime: "python3.12",
+        url: {
+          cors: true,
+          authorization: "none",
+        },
+        timeout: "60 seconds",  // Longer timeout for resume generation
+        memory: "1536 MB",       // More memory for larger prompts
+        permissions: [
+          {
+            actions: ["bedrock:InvokeModel",
+              "bedrock:InvokeModelWithResponseStream"
+            ],
+            resources: ["*"],
+          },
+        ],
+    });
+
+    // -----------------------------
     // Return outputs for frontend / other usage
     // -----------------------------
     return {
       tableName: table.name,
       counterUrl: counterApi.url,
       chatbotUrl: chatbotApi.url,
+      atsGeneratorUrl: atsGeneratorApi.url,
     };
   },
 });
