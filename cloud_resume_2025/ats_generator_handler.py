@@ -1,6 +1,6 @@
 import json
 import boto3
-import os
+import traceback
 
 # Initialize Bedrock client
 bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
@@ -9,6 +9,8 @@ def handler(event, context):
     """
     Lambda function to generate ATS-optimized resumes using Amazon Bedrock.
     """
+
+    print(f"Received event: {json.dumps(event)}")
 
     # Handle CORS preflight
     if event.get('requestContext', {}).get('http', {}).get('method') == 'OPTIONS':
@@ -24,21 +26,23 @@ def handler(event, context):
 
     try:
         # Parse request body
-        if isinstance(event.get('body'), str):
-            body = json.loads(event['body'])
-        else:
-            body = event.get('body', {})
+        body = event.get('body', '{}')
+        if isinstance(body, str):
+            body = json.loads(body)
+
+        print(f"Parsed body: {json.dumps(body)}")
 
         job_description = body.get('jobDescription', '')
 
         if not job_description:
+            print("ERROR: No job description provided")
             return {
                 'statusCode': 400,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json',
                 },
-                'body': json.dumps({'error': 'Job description is required'})
+                'body': json.dumps({'error': 'Job description is required', 'success': False})
             }
 
         # Candidate information (your resume data)
@@ -87,10 +91,6 @@ Lersha App - Android & Backend Development
 Developed and deployed 4 native Android apps (Agent, Service Provider, Dashboard, and Loan modules) serving 1,300+ agents and 100,000+ farmers with offline-first functionality.
 Tech: Java/Kotlin, Node.js, MySQL, REST APIs, Android SDK
 
-Dashen Malt Barley Project - Cloud Dashboard
-Designed and deployed QlikSense dashboards to track agricultural loan disbursements and repayment metrics across multiple partner institutions.
-Tech: QlikSense, SQL, Data Analytics, ETL Pipelines
-
 Cloud Resume Challenge (2025)
 Modern serverless resume website featuring real-time visitor counter and AI-powered chatbot using Amazon Bedrock and Claude. Demonstrates cloud-native architecture with Infrastructure as Code.
 Tech: Next.js, TypeScript, AWS Lambda, DynamoDB, Bedrock, SST
@@ -135,6 +135,8 @@ FORMAT REQUIREMENTS:
 
 Generate the complete, ready-to-use resume now:"""
 
+        print("Calling Bedrock API...")
+
         # Call Bedrock API
         request_body = {
             "anthropic_version": "bedrock-2023-05-31",
@@ -158,6 +160,8 @@ Generate the complete, ready-to-use resume now:"""
         response_body = json.loads(response['body'].read())
         resume_text = response_body['content'][0]['text']
 
+        print(f"Resume generated successfully, length: {len(resume_text)} characters")
+
         return {
             'statusCode': 200,
             'headers': {
@@ -171,7 +175,11 @@ Generate the complete, ready-to-use resume now:"""
         }
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        error_msg = str(e)
+        error_trace = traceback.format_exc()
+        print(f"ERROR: {error_msg}")
+        print(f"TRACEBACK: {error_trace}")
+
         return {
             'statusCode': 500,
             'headers': {
@@ -179,7 +187,7 @@ Generate the complete, ready-to-use resume now:"""
                 'Content-Type': 'application/json',
             },
             'body': json.dumps({
-                'error': str(e),
+                'error': error_msg,
                 'success': False
             })
         }
