@@ -1,12 +1,29 @@
 'use client'
 
-import { Briefcase, GraduationCap, Code, Award, MapPin, Phone, Mail, Github, Linkedin, ExternalLink, Sparkles } from 'lucide-react'
+import { Briefcase, GraduationCap, Code, Award, MapPin, Phone, Mail, Github, Linkedin, ExternalLink, Sparkles, Calendar } from 'lucide-react'
 
 export default function Resume() {
   return (
     <div className="space-y-6">
       {/* Contact Info Card - Modern Design */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-slate-200 dark:border-slate-700 hover:shadow-2xl transition-shadow duration-300">
+        {/* Call to Action - Schedule a Call */}
+        <div className="mb-6 text-center">
+          <a
+            href="https://calendar.google.com/calendar/appointments/schedules/YOUR_CALENDAR_ID"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-full hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <Calendar className="w-6 h-6" />
+            <span>Schedule a Call</span>
+            <ExternalLink className="w-4 h-4" />
+          </a>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-3">
+            Let&apos;s discuss your next project or opportunity
+          </p>
+        </div>
+
         <div className="flex flex-wrap gap-4 justify-center text-sm">
           <a href="tel:+12409277827" className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
             <Phone className="w-4 h-4" />
