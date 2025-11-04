@@ -336,7 +336,20 @@ GitHub: ${CANDIDATE_INFO.github}
    - Use in context: "Architected AWS Lambda functions", "Implemented React components", "Deployed Kubernetes clusters"
 
 **OUTPUT FORMAT:**
-Create a complete, ready-to-submit resume in plain text format. Start with name and contact info, followed by professional summary, then skills, experience, projects, education, and certifications. Make it ATS-friendly and keyword-optimized for the specific job description provided.
+CRITICAL: Output ONLY the final resume text. Do NOT include any preamble, explanations, or phrases like "Here is the optimized resume" or "I've created". Start IMMEDIATELY with the candidate's name.
+
+Create a complete, ready-to-submit resume in plain text format that includes:
+- Name and contact information (at the top)
+- Professional Summary (3-4 lines)
+- Technical Skills (organized by category)
+- Professional Experience (ALL positions with ALL bullet points)
+- Projects (ALL projects listed above)
+- Education
+- Certifications
+
+IMPORTANT: Include ALL work experiences and ALL projects. Do not truncate or shorten the resume. Make it comprehensive and complete - 2 pages is acceptable for this level of experience.
+
+OUTPUT THE RESUME NOW WITHOUT ANY PREAMBLE:
 `
 
   return resume
