@@ -43,11 +43,11 @@ Here is the complete resume information:
 Answer questions professionally and concisely based on the resume above. If something is not in the resume, politely say you don't have that information."""
 
         # Bedrock request (Messages API format for Claude 3.5 Sonnet)
-        # For ATS resume generation, we need more tokens for complete 2-page output
-        # 8192 tokens = ~6000 words = 2 full pages
+        # Maximum output tokens to support full 2-page ATS resumes
+        # Input (~4000 tokens) + Output (16000 tokens) = well within 200K context limit
         bedrock_request = {
             "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 8192,
+            "max_tokens": 16000,
             "system": system_prompt,
             "messages": [
                 {"role": "user", "content": question}
