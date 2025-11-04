@@ -29,6 +29,7 @@ dist/
 .env.local
 .env.*.local
 *.env
+*.env.*
 
 # Logs
 logs/
@@ -59,3 +60,6 @@ updated-trust-policy.json
 # Scripts
 enable_bedrock_access.py
 submit_anthropic_usecase.py
+
+# Documentation backup
+BACKUP_DOCUMENTATION/

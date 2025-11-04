@@ -10,8 +10,7 @@ export default function VisitorCounter() {
 
   useEffect(() => {
     const fetchCount = async () => {
-      // Hardcoded API URL for static export
-      const apiUrl = 'https://3fednny2psoslmrcesjkexjtsy0yauae.lambda-url.us-east-1.on.aws/'
+      const apiUrl = process.env.NEXT_PUBLIC_COUNTER_API
 
       if (!apiUrl) {
         setError('Counter API URL not configured')

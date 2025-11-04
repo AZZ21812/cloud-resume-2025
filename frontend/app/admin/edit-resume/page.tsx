@@ -124,11 +124,8 @@ export default function EditResume() {
     setSaveStatus('idle')
 
     try {
-      // TODO: Replace with actual API call to save resume data to DynamoDB
-      // For now, save to localStorage
       localStorage.setItem('resume_data', JSON.stringify(resumeData))
-
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
       setSaveStatus('success')
       setTimeout(() => setSaveStatus('idle'), 3000)
@@ -267,10 +264,9 @@ export default function EditResume() {
               />
             </div>
 
-            {/* Note about full editor */}
             <div className="bg-blue-900/30 border border-blue-700 rounded-xl p-4">
               <p className="text-blue-200 text-sm">
-                <strong>Note:</strong> This is a simplified editor. Experience, projects, and skills can be edited by expanding this interface or using the full JSON editor (coming soon).
+                <strong>Note:</strong> This is a simplified editor. Currently saves to browser storage. For full resume editing, expand this interface or modify the Resume component directly.
               </p>
             </div>
           </div>

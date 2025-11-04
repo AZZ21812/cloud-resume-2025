@@ -1,209 +1,195 @@
-# Cloud Resume Challenge - 2025 Edition
+# Cloud Resume 2025
 
-A modern cloud resume built with Next.js, AWS Lambda, DynamoDB, and Amazon Bedrock.
+A modern serverless resume website built with Next.js, AWS Lambda, DynamoDB, and Amazon Bedrock. Features real-time visitor counter, AI-powered chatbot, and admin panel for ATS-optimized resume generation.
 
-## 🚀 Features
+## Live Demo
 
-- **Modern Frontend**: Next.js 15 with App Router, TypeScript, Tailwind CSS
-- **Serverless Backend**: AWS Lambda with Function URLs
-- **Real-time Counter**: DynamoDB-powered visitor tracking
-- **AI Chatbot**: Amazon Bedrock integration for resume Q&A
-- **Infrastructure as Code**: SST v3 for easy deployment
-- **CI/CD**: GitHub Actions with OIDC
-- **Cost-Optimized**: ~$0-5/month
+**Website:** https://d5rk3dryo0e0i.cloudfront.net
 
-## 📁 Project Structure
+## Features
+
+- Modern, responsive Next.js frontend with TypeScript and Tailwind CSS
+- Real-time visitor counter using AWS Lambda and DynamoDB
+- AI-powered chatbot using Amazon Bedrock (Claude 3 Haiku)
+- Admin panel with ATS resume generator
+- Serverless architecture with Infrastructure as Code (SST)
+- CI/CD pipeline with GitHub Actions
+- Hosted on AWS S3 + CloudFront
+
+## Architecture
+
+```
+┌──────────────────┐
+│  CloudFront CDN  │ ← Frontend (Next.js)
+└────────┬─────────┘
+         │
+┌────────▼──────────────────────────┐
+│         AWS Services               │
+│                                    │
+│  ┌────────────┐   ┌────────────┐  │
+│  │  Lambda    │──▶│ DynamoDB   │  │
+│  │  Counter   │   └────────────┘  │
+│  └────────────┘                    │
+│                                    │
+│  ┌────────────┐   ┌────────────┐  │
+│  │  Lambda    │──▶│  Bedrock   │  │
+│  │  Chatbot   │   │  (Claude)  │  │
+│  └────────────┘   └────────────┘  │
+└────────────────────────────────────┘
+```
+
+## Tech Stack
+
+**Frontend:**
+- Next.js 16 (canary)
+- React 19
+- TypeScript
+- Tailwind CSS
+- jsPDF for PDF generation
+
+**Backend:**
+- AWS Lambda (Python 3.12)
+- Amazon DynamoDB
+- Amazon Bedrock (Claude 3 Haiku)
+- AWS S3 + CloudFront
+
+**Infrastructure:**
+- SST v3 (Infrastructure as Code)
+- GitHub Actions (CI/CD)
+- AWS OIDC authentication
+
+## Project Structure
 
 ```
 cloud-resume-2025/
-├── frontend/           # Next.js application
-├── backend/            # Lambda functions
-├── sst.config.ts       # SST infrastructure
-├── .github/            # CI/CD workflows
+├── frontend/                    # Next.js application
+│   ├── app/
+│   │   ├── components/         # React components
+│   │   ├── admin/              # Admin panel
+│   │   └── page.tsx            # Main page
+│   └── package.json
+├── cloud_resume_2025/          # Lambda handlers
+│   ├── counter_handler.py      # Visitor counter
+│   └── chatbot_handler.py      # AI chatbot
+├── sst.config.ts               # Infrastructure config
+├── .github/workflows/          # CI/CD pipelines
 └── README.md
 ```
 
-## 🛠️ Prerequisites
+## Getting Started
 
-- Node.js 18+ and npm
-- AWS Account with credentials configured
-- AWS CLI installed
-- Git and GitHub account
+### Prerequisites
 
-## 🚀 Quick Start
+- Node.js 18+
+- AWS Account with CLI configured
+- Python 3.12+
+- Git
 
-### 1. Clone and Install
+### Installation
 
+1. Clone the repository
 ```bash
-git clone <your-repo>
+git clone <repository-url>
 cd cloud-resume-2025
-npm install
 ```
 
-### 2. Install Frontend Dependencies
+2. Install dependencies
+```bash
+npm install
+cd frontend && npm install && cd ..
+```
 
+3. Configure environment variables
+
+Create `frontend/.env.local`:
+```env
+NEXT_PUBLIC_COUNTER_API=<your-counter-lambda-url>
+NEXT_PUBLIC_CHATBOT_API=<your-chatbot-lambda-url>
+NEXT_PUBLIC_ADMIN_EMAIL=<your-admin-email>
+NEXT_PUBLIC_ADMIN_PASSWORD=<your-admin-password>
+```
+
+4. Deploy infrastructure
+```bash
+npx sst deploy --stage production
+```
+
+5. Build and deploy frontend
 ```bash
 cd frontend
-npm install
-cd ..
+npm run build
+aws s3 sync out/ s3://<your-bucket-name>/ --delete
+aws cloudfront create-invalidation --distribution-id <your-distribution-id> --paths "/*"
 ```
 
-### 3. Deploy Infrastructure
+## Development
 
+### Run locally
 ```bash
-# Deploy to dev environment
-npx sst deploy
-
-# This will create:
-# - DynamoDB table
-# - Lambda functions
-# - Function URLs
-```
-
-### 4. Configure Frontend
-
-After deployment, SST will output your API URLs. Create `frontend/.env.local`:
-
-```env
-NEXT_PUBLIC_COUNTER_API=<your-counter-function-url>
-NEXT_PUBLIC_CHATBOT_API=<your-chatbot-function-url>
-```
-
-### 5. Run Frontend Locally
-
-```bash
+# Start dev server
 cd frontend
 npm run dev
 ```
 
-Visit `http://localhost:3000`
-
-### 6. Deploy Frontend to Vercel
-
+### Deploy backend
 ```bash
-# Install Vercel CLI
-npm i -g vercel
+npx sst deploy
+```
 
-# Deploy
+### Deploy frontend
+```bash
 cd frontend
-vercel
+npm run build
+# Upload to S3 and invalidate CloudFront cache
 ```
 
-## 🏗️ Architecture
+## Admin Panel
 
-```
-┌─────────────┐
-│   Vercel    │  Frontend (Next.js)
-│   (Free)    │
-└──────┬──────┘
-       │
-       │ HTTPS
-       │
-┌──────▼──────────────────────────┐
-│         AWS Cloud               │
-│                                 │
-│  ┌─────────────┐               │
-│  │   Lambda    │               │
-│  │   Counter   │───┐           │
-│  └─────────────┘   │           │
-│                     │           │
-│  ┌─────────────┐   │  ┌──────┐ │
-│  │   Lambda    │   └─▶│ Dyna │ │
-│  │   Chatbot   │──────│  DB  │ │
-│  └─────┬───────┘      └──────┘ │
-│        │                        │
-│        │                        │
-│  ┌─────▼───────┐               │
-│  │   Bedrock   │               │
-│  │   Claude    │               │
-│  └─────────────┘               │
-└─────────────────────────────────┘
-```
+Access the admin panel at `/admin/login` (local development only, not deployed to S3).
 
-## 📝 Environment Variables
+Features:
+- Resume editor with live preview
+- ATS-optimized resume generator
+- AI-powered job description analysis
+- Professional PDF export
 
-### Frontend (.env.local)
-```env
-NEXT_PUBLIC_COUNTER_API=https://xxx.lambda-url.us-east-1.on.aws
-NEXT_PUBLIC_CHATBOT_API=https://yyy.lambda-url.us-east-1.on.aws
-```
+## CI/CD Pipeline
 
-### Backend (set in SST config)
-```env
-DYNAMODB_TABLE_NAME=<auto-set-by-sst>
-```
+GitHub Actions automatically:
+- Runs tests and linting
+- Builds frontend
+- Deploys to S3
+- Invalidates CloudFront cache
 
-## 🧪 Testing
+Triggered on push to `main` branch.
 
-```bash
-# Test counter API
-curl https://your-counter-url.lambda-url.us-east-1.on.aws
+## Cost Estimate
 
-# Test chatbot API
-curl -X POST https://your-chatbot-url.lambda-url.us-east-1.on.aws \
-  -H "Content-Type: application/json" \
-  -d '{"question": "What is your experience with AWS?"}'
-```
+For 10,000 monthly visitors:
+- Lambda: $0.20
+- DynamoDB: $0.25
+- S3: $0.23
+- CloudFront: $1.00
+- Bedrock: $5.00 (varies by usage)
+- Data Transfer: $0.40
 
-## 🚢 Deployment
+**Total: ~$7.08/month**
 
-### Development
-```bash
-npx sst deploy --stage dev
-```
+## Security
 
-### Production
-```bash
-npx sst deploy --stage prod
-```
+- No hardcoded credentials in repository
+- Admin credentials stored in environment variables
+- All .env files excluded from version control
+- HTTPS enforced via CloudFront
+- CORS configured for Lambda Function URLs
 
-## 💰 Cost Breakdown
-
-- **Vercel**: FREE (personal projects)
-- **Lambda**: FREE tier (1M requests/month)
-- **DynamoDB**: ~$0 (on-demand, low traffic)
-- **Bedrock**: ~$0.003 per 1K tokens (pay-as-you-go)
-- **Total**: $0-5/month for personal use
-
-## 🔧 Customization
-
-### Update Resume Content
-Edit `frontend/app/components/Resume.tsx`
-
-### Modify Chatbot Responses
-Edit `backend/chatbot/index.py` to customize the system prompt
-
-### Change Styling
-Update Tailwind config in `frontend/tailwind.config.ts`
-
-## 📚 Tech Stack
-
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **Backend**: Python 3.13, AWS Lambda
-- **Database**: Amazon DynamoDB
-- **AI**: Amazon Bedrock (Claude)
-- **IaC**: SST v3
-- **Hosting**: Vercel (frontend), AWS (backend)
-- **CI/CD**: GitHub Actions
-
-## 🎯 Next Steps
-
-1. ✅ Get basic site running
-2. ✅ Deploy infrastructure
-3. ✅ Connect frontend to backend
-4. 🔲 Add custom domain
-5. 🔲 Enable Bedrock chatbot
-6. 🔲 Set up CI/CD pipeline
-7. 🔲 Add monitoring and alerts
-8. 🔲 Write blog post about the project
-
-## 📖 Resources
-
-- [SST Documentation](https://sst.dev)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
-- [Amazon Bedrock Documentation](https://docs.aws.amazon.com/bedrock/)
-
-## 📄 License
+## License
 
 MIT
+
+## Contact
+
+Amanuel Z. Alemu
+- Email: Amanuelzegeye63@gmail.com
+- LinkedIn: [linkedin.com/in/amanuel-alemu-50b014255](https://linkedin.com/in/amanuel-alemu-50b014255)
+- GitHub: [github.com/AZZ2181](https://github.com/AZZ2181)

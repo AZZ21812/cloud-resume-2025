@@ -1,5 +1,6 @@
 import json
 import boto3
+from cloud_resume_2025.resume_data import get_formatted_resume
 
 # Initialize Bedrock client
 bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
@@ -29,9 +30,17 @@ def handler(event, context):
         if not question:
             return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Question is required'})}
 
-        # System prompt
-        system_prompt = """You are an AI assistant helping visitors learn about Amanuel Z. Alemu's professional background.
-Answer professionally and concisely. If something is not in the resume, politely say you don't have that information."""
+        # Get formatted resume data
+        resume_data = get_formatted_resume()
+
+        # System prompt with resume data
+        system_prompt = f"""You are an AI assistant helping visitors learn about Amanuel Z. Alemu's professional background.
+
+Here is the complete resume information:
+
+{resume_data}
+
+Answer questions professionally and concisely based on the resume above. If something is not in the resume, politely say you don't have that information."""
 
         # Bedrock request (Messages API format for Claude 3.5 Sonnet)
         bedrock_request = {

@@ -17,10 +17,8 @@ export default function AdminLogin() {
     setLoading(true)
 
     try {
-      // Simple client-side authentication (for demo - replace with AWS Cognito in production)
-      // Store admin credentials in environment variables
-      const ADMIN_EMAIL = 'Amanuelzegeye63@gmail.com'
-      const ADMIN_PASSWORD = 'Aman2544' // Change this!
+      const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || ''
+      const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || ''
 
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         // Set session token (in production, use JWT or AWS Cognito)

@@ -19,8 +19,11 @@ export default function Chatbot() {
 
     if (!input.trim() || loading) return
 
-    // Hardcoded API URL for static export
-    const apiUrl = 'https://hefzysfj6mkfl5jl4zmueoesa40gwtfc.lambda-url.us-east-1.on.aws/'
+    const apiUrl = process.env.NEXT_PUBLIC_CHATBOT_API
+    if (!apiUrl) {
+      console.error('Chatbot API URL not configured')
+      return
+    }
 
     const userMessage = input.trim()
     setInput('')
