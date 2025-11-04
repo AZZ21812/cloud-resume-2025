@@ -42,29 +42,32 @@ Here is the complete resume information:
 
 Answer questions professionally and concisely based on the resume above. If something is not in the resume, politely say you don't have that information."""
 
-        # Bedrock request (Messages API format for Claude 3.5 Sonnet)
-        # Maximum output tokens to support full 2-page ATS resumes
-        # Input (~4000 tokens) + Output (16000 tokens) = well within 200K context limit
+        # Try Amazon Nova Premier for better long-form content generation
+        # Nova Premier is Amazon's most capable model and handles longer outputs well
         bedrock_request = {
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 16000,
-            "system": system_prompt,
             "messages": [
-                {"role": "user", "content": question}
-            ]
+                {"role": "user", "content": [{"text": system_prompt + "\n\n" + question}]}
+            ],
+            "inferenceConfig": {
+                "maxTokens": 16000,
+                "temperature": 0.7
+            }
         }
 
-        # Invoke Bedrock model using cross-region inference profile
+        # Invoke Bedrock model with Amazon Nova Premier
         response = bedrock.invoke_model(
-            modelId='us.anthropic.claude-3-5-sonnet-20241022-v2:0',
+            modelId='amazon.nova-premier-v1:0',
             contentType='application/json',
             body=json.dumps(bedrock_request)
         )
 
-        # Parse response
+        # Parse response (Nova Premier format)
         response_body = json.loads(response['body'].read())
-        # Messages API returns content as an array with text blocks
-        content = response_body.get('content', [])
+
+        # Nova Premier returns output in this format
+        output = response_body.get('output', {})
+        message = output.get('message', {})
+        content = message.get('content', [])
         answer = content[0].get('text', '') if content else ''
 
         return {
@@ -73,7 +76,7 @@ Answer questions professionally and concisely based on the resume above. If some
             'body': json.dumps({
                 'question': question,
                 'answer': answer,
-                'model': 'claude-3-5-sonnet-v2'
+                'model': 'amazon-nova-premier'
             })
         }
 
