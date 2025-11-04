@@ -285,39 +285,58 @@ TECHNICAL SKILLS - USE ALL OF THESE:
   resume += `\n=== JOB DESCRIPTION TO MATCH ===\n${jobDescription}\n`
 
   resume += `
-===CRITICAL INSTRUCTIONS - READ CAREFULLY===
+<instructions>
+You MUST create a DETAILED, COMPREHENSIVE 2-PAGE RESUME. This is NOT a summary.
 
-LENGTH REQUIREMENT: Output a MINIMUM of 2000 words. This is a 2-PAGE resume. Do NOT write a short 1-page resume.
+MANDATORY SECTIONS - DO NOT SKIP ANY:
 
-CONTENT REQUIREMENTS (MUST INCLUDE ALL):
-1. Professional Summary: Write 5-6 LONG sentences integrating 20+ keywords from the job description
-2. Technical Skills: List ALL skill categories above, organized and formatted professionally
-3. Professional Experience: Include BOTH positions:
-   - Strategy & Product Design Lead at IE Networks (Sep 2024 - Apr 2025) - Write ALL 5 achievement bullets in detail
-   - Senior Mobile Developer at Lersha (Sep 2021 - May 2024) - Write ALL 7 achievement bullets in detail
-4. Projects: Include ALL 6 projects with full descriptions:
-   - AP Wallet (5 bullets)
-   - Cloud Resume Challenge (5 bullets)
-   - Lersha Agricultural Platform (6 bullets)
-   - Dashen Malt Barley Project (1 bullet)
-   - GSMA-IF Program (3 bullets)
-   - Mercy Corps Agri-Fin Project (3 bullets)
-5. Education: Full degree information
-6. Certifications: All 3 certifications
+1. HEADER: ${CANDIDATE_INFO.name} with full contact info
 
-ATS OPTIMIZATION:
-- Extract EVERY keyword from job description
-- Use exact terminology 4-5 times throughout resume
-- Rewrite bullets to emphasize job description keywords
-- Add metrics and numbers
+2. PROFESSIONAL SUMMARY: Write a 150-word paragraph (8-10 sentences) that:
+   - Mentions "Software Engineer" and highlights from job description
+   - Integrates 25+ technical keywords: Python, GraphQL, FastAPI, React, TypeScript, REST APIs, microservices, AWS, Docker, CI/CD, Git, Linux, database optimization, SQL, backend development, frontend development, API design, cloud environments, Agile, problem-solving, security best practices, Tailwind CSS, automated testing, etc.
+   - Showcases 7+ years combined experience
 
-OUTPUT FORMAT:
-- Start with candidate name immediately (NO "Here is" or preamble)
-- Use standard section headers
-- Use bullet points (•)
-- Make it comprehensive and detailed
+3. TECHNICAL SKILLS: List ALL categories with ALL skills (use the full list provided above)
 
-WRITE THE COMPLETE 2-PAGE RESUME NOW (MINIMUM 2000 WORDS):
+4. PROFESSIONAL EXPERIENCE SECTION:
+
+POSITION 1: Strategy & Product Design Lead | IE Networks Solution | Sep 2024 - Apr 2025
+Write detailed paragraphs for EACH of these 5 achievements (3-4 sentences each, total ~200 words):
+• Led strategic technology initiatives including BPO-ITO services and Tech Talent Academy
+• Managed cross-functional engineering team of 10+ developers
+• Architected Selamnew Workspace platform
+• Developed comprehensive 3-year technology roadmap
+• Secured 5+ strategic technology partnerships
+
+POSITION 2: Senior Mobile Developer & Data Analytics Lead | Lersha, Green Agro Solution | Sep 2021 - May 2024
+Write detailed paragraphs for EACH of these 7 achievements (3-4 sentences each, total ~300 words):
+• Led development of 4 native Android applications using Java/Kotlin
+• Designed scalable Node.js backend systems with RESTful APIs
+• Integrated offline-first functionality
+• Implemented comprehensive data analytics pipelines
+• Developed KYC verification dashboards
+• Optimized application performance achieving 40% faster load times
+• Collaborated with cross-functional teams in Agile sprints
+
+5. PROJECTS SECTION - Write 2-3 sentences for EACH project:
+• AP Wallet - Cloud-Native Fintech Application (mention 15+ AWS services, CI/CD, security)
+• Cloud Resume Challenge (mention serverless, Bedrock, DynamoDB, Infrastructure as Code)
+• Lersha Agricultural Platform (mention 4 apps, Node.js, MySQL, 100K+ users)
+• Dashen Malt Barley Project (mention QlikSense dashboards)
+• GSMA-IF Program (mention 4 Qlik dashboards, Mobile World Congress)
+• Mercy Corps Agri-Fin Project (mention RFPs, technical proposals, cloud-based solutions)
+
+6. EDUCATION: Bachelor of Science in Software Engineering | Staffordshire University | 2018-2021
+
+7. CERTIFICATIONS: List all 3
+
+ATS OPTIMIZATION: Mirror job description keywords throughout. Use terms: Python, GraphQL, FastAPI, React, TypeScript, RESTful APIs, backend services, API design, database optimization, microservices, Docker, AWS, Azure, Git, Linux, CI/CD, automated testing, Agile, problem-solving, security best practices, Tailwind CSS
+
+START WRITING THE COMPLETE RESUME NOW. Output at least 1800 words:
+</instructions>
+
+${CANDIDATE_INFO.name}
 `
 
   return resume

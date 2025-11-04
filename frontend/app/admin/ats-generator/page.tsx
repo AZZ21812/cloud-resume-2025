@@ -385,7 +385,7 @@ We're looking for an experienced developer with:
               )}
 
               {generated && (
-                <div className="bg-white rounded-lg p-8 max-h-[800px] overflow-y-auto">
+                <div className="bg-white rounded-lg p-8 max-h-[1800px] overflow-y-auto">
                   <pre className="whitespace-pre-wrap font-mono text-sm text-slate-800 leading-relaxed">
                     {tailoredResume}
                   </pre>
