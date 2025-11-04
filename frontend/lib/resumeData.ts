@@ -280,7 +280,13 @@ SKILLS: `
   resume += `\n=== JOB DESCRIPTION ===\n${jobDescription}\n`
 
   resume += `
-INSTRUCTIONS: Create 95%+ ATS-optimized resume. Extract ALL keywords from job description. Use exact terminology 3-5x each. Start with name (NO preamble). Include: Summary (3-4 lines, 10+ keywords), Technical Skills (grouped), ALL Experience (rewrite bullets with job keywords, add metrics), ALL Projects, Education, Certs. 2 pages OK. Output ONLY resume text now:
+CRITICAL INSTRUCTIONS:
+- Extract ALL keywords from job description and use 3-5x each
+- Create COMPLETE 2-PAGE resume (minimum 1500 words)
+- Start with: ${CANDIDATE_INFO.name} (NO preamble text)
+- Include: Summary (4 lines, 15+ keywords), Technical Skills (all categories), BOTH work experiences (IE Networks 2024-2025 + Lersha 2021-2024) with ALL bullets, ALL 6 projects (AP Wallet, Cloud Resume, Lersha Platform, Dashen, GSMA, Mercy Corps), Education, 3 Certifications
+- DO NOT TRUNCATE. Write complete detailed bullets for every experience and project
+- Output FULL resume NOW:
 `
 
   return resume
