@@ -240,19 +240,24 @@ export const CERTIFICATIONS = [
 ]
 
 export function getFormattedResumeForATS(jobDescription: string): string {
-  // Condensed prompt to save input tokens, maximize output tokens
-  let resume = `Create a 95%+ ATS-optimized resume for SOFTWARE ENGINEERING role. Extract ALL keywords from job description and integrate them naturally.
+  let resume = `You are creating a COMPLETE 2-PAGE ATS-optimized resume for a SOFTWARE ENGINEERING position.
 
-CANDIDATE: ${CANDIDATE_INFO.name} | ${CANDIDATE_INFO.email} | ${CANDIDATE_INFO.phone} | ${CANDIDATE_INFO.location}
-LinkedIn: ${CANDIDATE_INFO.linkedin} | GitHub: ${CANDIDATE_INFO.github}
+CANDIDATE INFORMATION:
+Name: ${CANDIDATE_INFO.name}
+Email: ${CANDIDATE_INFO.email}
+Phone: ${CANDIDATE_INFO.phone}
+Location: ${CANDIDATE_INFO.location}
+LinkedIn: ${CANDIDATE_INFO.linkedin}
+GitHub: ${CANDIDATE_INFO.github}
 
-SKILLS: `
+TECHNICAL SKILLS - USE ALL OF THESE:
+`
 
-  // Condense skills into comma-separated list
-  const allSkills = Object.values(TECHNICAL_SKILLS).flat()
-  resume += allSkills.join(", ") + "\n\n"
+  for (const [category, skills] of Object.entries(TECHNICAL_SKILLS)) {
+    resume += `${category}: ${skills.join(", ")}\n`
+  }
 
-  resume += "\n=== PROFESSIONAL EXPERIENCE (Highlight relevant parts based on job) ===\n"
+  resume += "\n=== PROFESSIONAL EXPERIENCE - INCLUDE ALL DETAILS ===\n"
   for (const exp of PROFESSIONAL_EXPERIENCE) {
     resume += `\n${exp.title} | ${exp.company} | ${exp.period}\n`
     for (const achievement of exp.achievements) {
@@ -277,16 +282,42 @@ SKILLS: `
     resume += `• ${cert}\n`
   }
 
-  resume += `\n=== JOB DESCRIPTION ===\n${jobDescription}\n`
+  resume += `\n=== JOB DESCRIPTION TO MATCH ===\n${jobDescription}\n`
 
   resume += `
-CRITICAL INSTRUCTIONS:
-- Extract ALL keywords from job description and use 3-5x each
-- Create COMPLETE 2-PAGE resume (minimum 1500 words)
-- Start with: ${CANDIDATE_INFO.name} (NO preamble text)
-- Include: Summary (4 lines, 15+ keywords), Technical Skills (all categories), BOTH work experiences (IE Networks 2024-2025 + Lersha 2021-2024) with ALL bullets, ALL 6 projects (AP Wallet, Cloud Resume, Lersha Platform, Dashen, GSMA, Mercy Corps), Education, 3 Certifications
-- DO NOT TRUNCATE. Write complete detailed bullets for every experience and project
-- Output FULL resume NOW:
+===CRITICAL INSTRUCTIONS - READ CAREFULLY===
+
+LENGTH REQUIREMENT: Output a MINIMUM of 2000 words. This is a 2-PAGE resume. Do NOT write a short 1-page resume.
+
+CONTENT REQUIREMENTS (MUST INCLUDE ALL):
+1. Professional Summary: Write 5-6 LONG sentences integrating 20+ keywords from the job description
+2. Technical Skills: List ALL skill categories above, organized and formatted professionally
+3. Professional Experience: Include BOTH positions:
+   - Strategy & Product Design Lead at IE Networks (Sep 2024 - Apr 2025) - Write ALL 5 achievement bullets in detail
+   - Senior Mobile Developer at Lersha (Sep 2021 - May 2024) - Write ALL 7 achievement bullets in detail
+4. Projects: Include ALL 6 projects with full descriptions:
+   - AP Wallet (5 bullets)
+   - Cloud Resume Challenge (5 bullets)
+   - Lersha Agricultural Platform (6 bullets)
+   - Dashen Malt Barley Project (1 bullet)
+   - GSMA-IF Program (3 bullets)
+   - Mercy Corps Agri-Fin Project (3 bullets)
+5. Education: Full degree information
+6. Certifications: All 3 certifications
+
+ATS OPTIMIZATION:
+- Extract EVERY keyword from job description
+- Use exact terminology 4-5 times throughout resume
+- Rewrite bullets to emphasize job description keywords
+- Add metrics and numbers
+
+OUTPUT FORMAT:
+- Start with candidate name immediately (NO "Here is" or preamble)
+- Use standard section headers
+- Use bullet points (•)
+- Make it comprehensive and detailed
+
+WRITE THE COMPLETE 2-PAGE RESUME NOW (MINIMUM 2000 WORDS):
 `
 
   return resume
