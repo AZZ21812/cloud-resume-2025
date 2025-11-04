@@ -240,23 +240,17 @@ export const CERTIFICATIONS = [
 ]
 
 export function getFormattedResumeForATS(jobDescription: string): string {
-  let resume = `You are an expert ATS resume writer for SOFTWARE ENGINEERING and TECH ROLES. Your task is to create a resume that will score 95%+ in ATS systems by ensuring MAXIMUM keyword matching.
+  // Condensed prompt to save input tokens, maximize output tokens
+  let resume = `Create a 95%+ ATS-optimized resume for SOFTWARE ENGINEERING role. Extract ALL keywords from job description and integrate them naturally.
 
-=== CANDIDATE PROFILE ===
-Name: ${CANDIDATE_INFO.name}
-Email: ${CANDIDATE_INFO.email}
-Phone: ${CANDIDATE_INFO.phone}
-Location: ${CANDIDATE_INFO.location}
-LinkedIn: ${CANDIDATE_INFO.linkedin}
-GitHub: ${CANDIDATE_INFO.github}
+CANDIDATE: ${CANDIDATE_INFO.name} | ${CANDIDATE_INFO.email} | ${CANDIDATE_INFO.phone} | ${CANDIDATE_INFO.location}
+LinkedIn: ${CANDIDATE_INFO.linkedin} | GitHub: ${CANDIDATE_INFO.github}
 
-=== TECHNICAL SKILLS (Use these to match job requirements) ===
-`
+SKILLS: `
 
-  for (const [category, skills] of Object.entries(TECHNICAL_SKILLS)) {
-    resume += `\n${category.toUpperCase()}:\n`
-    resume += skills.join(", ") + "\n"
-  }
+  // Condense skills into comma-separated list
+  const allSkills = Object.values(TECHNICAL_SKILLS).flat()
+  resume += allSkills.join(", ") + "\n\n"
 
   resume += "\n=== PROFESSIONAL EXPERIENCE (Highlight relevant parts based on job) ===\n"
   for (const exp of PROFESSIONAL_EXPERIENCE) {
@@ -283,73 +277,10 @@ GitHub: ${CANDIDATE_INFO.github}
     resume += `• ${cert}\n`
   }
 
-  resume += `\n=== JOB DESCRIPTION TO MATCH ===\n${jobDescription}\n`
+  resume += `\n=== JOB DESCRIPTION ===\n${jobDescription}\n`
 
   resume += `
-=== CRITICAL ATS OPTIMIZATION INSTRUCTIONS ===
-
-**MANDATORY REQUIREMENTS - YOU MUST FOLLOW THESE:**
-
-1. **KEYWORD MATCHING (HIGHEST PRIORITY):**
-   - Extract EVERY technical keyword, tool, framework, and technology mentioned in the job description
-   - Use those EXACT keywords and phrases throughout the resume (in skills section, experience bullets, project descriptions)
-   - If the job mentions "React" - use "React", "React.js", and "ReactJS" in different places
-   - If they want "AWS Lambda" - mention "AWS Lambda", "Lambda functions", and "serverless Lambda" multiple times
-   - Mirror their exact terminology: if they say "CI/CD pipelines" use that exact phrase, not just "continuous integration"
-   - Include keyword variations: "JavaScript" should appear as "JavaScript", "JS", and "ECMAScript" if relevant
-
-2. **PROFESSIONAL SUMMARY:**
-   - Create a 3-4 line summary that integrates 10-15 keywords from the job description
-   - Focus on years of experience with their specific tech stack
-   - Mention exact role title they're hiring for
-
-3. **TECHNICAL SKILLS SECTION:**
-   - List ALL relevant technologies from job description first
-   - Group by categories that match their requirements
-   - Include proficiency levels if they mention them
-   - Add synonyms and related tech (e.g., if they want "containers" mention both "Docker" and "Kubernetes")
-
-4. **EXPERIENCE SECTION:**
-   - Rewrite bullet points to emphasize technologies mentioned in job description
-   - Start bullets with their required skills: "Developed React applications..." not "Developed applications using React..."
-   - Add metrics and numbers (users served, performance improvements, team size)
-   - Mirror their language: if they say "collaborate", use "collaborated" not "worked with"
-
-5. **QUANTIFY EVERYTHING:**
-   - Add specific numbers: "100,000+ users", "40% performance improvement", "10+ team members"
-   - Include timeframes: "Led 3-month project", "Reduced costs by 30% within 6 months"
-
-6. **ATS FORMAT REQUIREMENTS:**
-   - Use standard section headers: PROFESSIONAL SUMMARY, TECHNICAL SKILLS, PROFESSIONAL EXPERIENCE, EDUCATION, CERTIFICATIONS
-   - Avoid tables, columns, graphics
-   - Use simple bullet points (•)
-   - Keep formatting minimal and clean
-
-7. **MATCH THEIR REQUIREMENTS:**
-   - If they list 10 requirements, address ALL 10 explicitly in the resume
-   - Use their exact phrasing: "Agile/Scrum environment" not just "Agile"
-   - If they want "5+ years" make sure experience reflects that clearly
-
-8. **KEYWORD DENSITY:**
-   - Aim for each critical skill to appear 3-5 times throughout resume
-   - Natural integration - don't just list keywords
-   - Use in context: "Architected AWS Lambda functions", "Implemented React components", "Deployed Kubernetes clusters"
-
-**OUTPUT FORMAT:**
-CRITICAL: Output ONLY the final resume text. Do NOT include any preamble, explanations, or phrases like "Here is the optimized resume" or "I've created". Start IMMEDIATELY with the candidate's name.
-
-Create a complete, ready-to-submit resume in plain text format that includes:
-- Name and contact information (at the top)
-- Professional Summary (3-4 lines)
-- Technical Skills (organized by category)
-- Professional Experience (ALL positions with ALL bullet points)
-- Projects (ALL projects listed above)
-- Education
-- Certifications
-
-IMPORTANT: Include ALL work experiences and ALL projects. Do not truncate or shorten the resume. Make it comprehensive and complete - 2 pages is acceptable for this level of experience.
-
-OUTPUT THE RESUME NOW WITHOUT ANY PREAMBLE:
+INSTRUCTIONS: Create 95%+ ATS-optimized resume. Extract ALL keywords from job description. Use exact terminology 3-5x each. Start with name (NO preamble). Include: Summary (3-4 lines, 10+ keywords), Technical Skills (grouped), ALL Experience (rewrite bullets with job keywords, add metrics), ALL Projects, Education, Certs. 2 pages OK. Output ONLY resume text now:
 `
 
   return resume
