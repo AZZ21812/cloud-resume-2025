@@ -1,0 +1,30 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: my-service                          # unique name, use kebab-case (no spaces)
+  title: My Service                         # human friendly display name
+  description: A short description of what this service does
+  tags:
+    - typescript                            # language/framework tags
+    - backend
+  annotations:
+    github.com/project-slug: my-org/my-repo # your GitHub org/repo
+    backstage.io/techdocs-ref: dir:.        # if you have techdocs documentation
+
+spec:
+  type: service          # service | website | library | pipeline | documentation
+  lifecycle: production  # experimental | development | production | deprecated
+  owner: team-platform   # must match the name of a Group or User entity
+
+  # optional — if this component exposes an API
+  providesApis:
+    - my-service-api
+
+  # optional — if this component calls other components
+  consumesApis:
+    - some-other-api
+
+  # optional — other components this depends on
+  dependsOn:
+    - component:default/some-other-service
+    - resource:default/my-postgres-database
