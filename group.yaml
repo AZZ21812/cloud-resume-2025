@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-platform                        # unique name, kebab-case
+  title: Platform Team                       # human friendly display name
+  description: Responsible for internal developer platform and infrastructure
+spec:
+  type: team                                 # team | business-unit | department | organization
+  profile:
+    displayName: Platform Team
+    email: platform-team@mycompany.com       # team email (optional)
+    picture: https://example.com/team.png    # team avatar (optional)
+  
+  parent: engineering                        # optional — parent group (e.g. a department)
+  
+  members:
+    - amanuelzegeye                          # must match User entity names
